@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { X, Github, Plus, Loader2, Check } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
+import { getApiUrl } from "@/lib/api-config";
 
 interface AddSkillModalProps {
   isOpen: boolean;
@@ -45,7 +46,7 @@ export function AddSkillModal({ isOpen, onClose, onSkillAdded }: AddSkillModalPr
       const repo = parts[1];
       const skillName = parts[2] || repo;
 
-      const res = await fetch("/api/custom-skills", {
+      const res = await fetch(getApiUrl("/api/custom-skills"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -86,7 +87,7 @@ export function AddSkillModal({ isOpen, onClose, onSkillAdded }: AddSkillModalPr
         throw new Error("Name and source repository are required.");
       }
 
-      const res = await fetch("/api/custom-skills", {
+      const res = await fetch(getApiUrl("/api/custom-skills"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

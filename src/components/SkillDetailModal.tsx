@@ -7,6 +7,8 @@ import { SkillMarkdownViewer } from "./SkillMarkdownViewer";
 import { X, ShieldCheck, ExternalLink, Github, Loader2 } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 
+import { getApiUrl } from "@/lib/api-config";
+
 interface SkillDetailModalProps {
   skill: SkillLeaderboardItem | null;
   onClose: () => void;
@@ -27,7 +29,7 @@ export function SkillDetailModal({ skill, onClose }: SkillDetailModalProps) {
     const [owner, repo] = skill.source.split("/");
     const skillName = skill.skillId || skill.name;
 
-    fetch(`/api/skills/${owner || "community"}/${repo || "skills"}/${skillName}`)
+    fetch(getApiUrl(`/api/skills/${owner || "community"}/${repo || "skills"}/${skillName}`))
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
         if (data) setDetail(data);
