@@ -17,6 +17,7 @@ export async function GET(
   if (custom) {
     const detail: SkillDetail = {
       ...custom,
+      description: custom.description || `Agent skill workflow for ${skill}`,
       author: owner,
       repoUrl: custom.repoUrl || `https://github.com/${source}`,
       agentCompatibility: ["Claude Code", "Cursor", "Antigravity", "Windsurf", "Copilot"],

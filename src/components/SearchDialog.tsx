@@ -5,7 +5,7 @@ import { Search, X, Terminal, ArrowUpRight, Check, Loader2 } from "lucide-react"
 import { SkillLeaderboardItem } from "@/types/skills";
 import { useLanguage } from "@/context/LanguageContext";
 
-import { getApiUrl } from "@/lib/api-config";
+import { apiFetch } from "@/lib/api-config";
 
 interface SearchDialogProps {
   isOpen: boolean;
@@ -39,7 +39,7 @@ export function SearchDialog({ isOpen, onClose, onSelectSkill }: SearchDialogPro
     setIsLoading(true);
     const handler = setTimeout(async () => {
       try {
-        const res = await fetch(getApiUrl(`/api/skills/search?q=${encodeURIComponent(query.trim())}`));
+        const res = await apiFetch(`/api/skills/search?q=${encodeURIComponent(query.trim())}`);
         if (res.ok) {
           const data = await res.json();
           setResults(data.skills || []);

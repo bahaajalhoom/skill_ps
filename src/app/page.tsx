@@ -13,7 +13,7 @@ import { AddSkillModal } from "@/components/AddSkillModal";
 import { LeaderboardView, SkillLeaderboardItem } from "@/types/skills";
 import { Copy, Check, Terminal, Search } from "lucide-react";
 
-import { getApiUrl } from "@/lib/api-config";
+import { apiFetch } from "@/lib/api-config";
 
 function HomePageContent() {
   const { t } = useLanguage();
@@ -43,7 +43,7 @@ function HomePageContent() {
     async (view: LeaderboardView, pageNum: number, append = false) => {
       setIsLoading(true);
       try {
-        const res = await fetch(getApiUrl(`/api/skills?view=${view}&page=${pageNum}`));
+        const res = await apiFetch(`/api/skills?view=${view}&page=${pageNum}`);
         if (res.ok) {
           const data = await res.json();
           const newSkills = Array.isArray(data.skills) ? data.skills : [];
