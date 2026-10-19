@@ -5,6 +5,8 @@ import Link from "next/link";
 import { Search, Plus, Globe, Terminal, Sparkles } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 
+import { PalestineFlag } from "./PalestineFlag";
+
 interface NavbarProps {
   onOpenSearch: () => void;
   onOpenAddModal: () => void;
@@ -30,24 +32,15 @@ export function Navbar({ onOpenSearch, onOpenAddModal }: NavbarProps) {
       <div className="max-w-6xl mx-auto h-14 px-4 sm:px-6 flex items-center justify-between gap-4">
         {/* Brand Logo & Name */}
         <div className="flex items-center gap-3">
-          <Link href="/" className="flex items-center gap-2 group">
-            {/* Vercel geometric icon */}
-            <svg
-              height="18"
-              viewBox="0 0 16 16"
-              width="18"
-              fill="currentColor"
-              className="text-white transition-transform group-hover:scale-105"
-            >
-              <path fillRule="evenodd" clipRule="evenodd" d="M8 1L16 15H0L8 1Z" />
-            </svg>
+          <Link href="/" className="flex items-center gap-2.5 group">
+            <PalestineFlag width={26} height={17} className="transition-transform group-hover:scale-105" />
             <span className="text-neutral-500 font-mono text-sm">/</span>
             <span className="font-semibold tracking-tight text-white font-mono text-base group-hover:text-neutral-300 transition-colors">
               {t("siteTitle")}
             </span>
           </Link>
           <span className="hidden sm:inline-flex items-center px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-            Live Ecosystem
+            {lang === "ar" ? "المنظومة الحية" : "Live Ecosystem"}
           </span>
         </div>
 

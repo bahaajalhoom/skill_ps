@@ -21,7 +21,12 @@ function HomePageContent() {
   const [page, setPage] = useState(0);
   const [hasMore, setHasMore] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
-  const [totalSkills, setTotalSkills] = useState(1409643);
+  const [cacheByView, setCacheByView] = useState<
+    Record<string, { skills: SkillLeaderboardItem[]; page: number; hasMore: boolean }>
+  >({});
+
+  // Fixed global ecosystem total matching skills.sh
+  const totalSkills = currentView === "custom" ? skills.length : 1409643;
 
   // Modals
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -39,13 +44,18 @@ function HomePageContent() {
         const res = await fetch(`/api/skills?view=${view}&page=${pageNum}`);
         if (res.ok) {
           const data = await res.json();
-          if (append) {
-            setSkills((prev) => [...prev, ...data.skills]);
-          } else {
-            setSkills(data.skills || []);
-          }
-          setHasMore(data.hasMore);
-          if (data.total) setTotalSkills(data.total);
+          const newSkills = Array.isArray(data.skills) ? data.skills : [];
+          
+          setSkills((prev) => {
+            const updated = append ? [...prev, ...newSkills] : newSkills;
+            // Update cache
+            setCacheByView((c) => ({
+              ...c,
+              [view]: { skills: updated, page: pageNum, hasMore: data.hasMore ?? true },
+            }));
+            return updated;
+          });
+          setHasMore(data.hasMore ?? true);
         }
       } catch (err) {
         console.error("Failed to fetch skills:", err);
@@ -56,10 +66,30 @@ function HomePageContent() {
     []
   );
 
+  // Switch tabs with instantaneous cache or immediate skeleton loading
+  const handleSelectView = (newView: LeaderboardView) => {
+    if (newView === currentView) return;
+    setCurrentView(newView);
+
+    if (cacheByView[newView]) {
+      // Instant switch from cache
+      setSkills(cacheByView[newView].skills);
+      setPage(cacheByView[newView].page);
+      setHasMore(cacheByView[newView].hasMore);
+      setIsLoading(false);
+    } else {
+      // Immediately clear and show skeleton loader
+      setSkills([]);
+      setPage(0);
+      setIsLoading(true);
+      fetchSkillsForView(newView, 0, false);
+    }
+  };
+
   useEffect(() => {
-    setPage(0);
-    fetchSkillsForView(currentView, 0, false);
-  }, [currentView, fetchSkillsForView]);
+    // Initial fetch on mount
+    fetchSkillsForView("all-time", 0, false);
+  }, [fetchSkillsForView]);
 
   const handleLoadMore = () => {
     if (isLoading || !hasMore) return;
@@ -160,7 +190,7 @@ function HomePageContent() {
           {/* View Selector Tabs */}
           <TabSelector
             currentView={currentView}
-            onSelectView={(view) => setCurrentView(view)}
+            onSelectView={(view) => handleSelectView(view)}
             totalCount={totalSkills}
           />
 

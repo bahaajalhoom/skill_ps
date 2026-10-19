@@ -42,7 +42,7 @@ export async function fetchLiveSkills(
       return {
         skills,
         page,
-        total: data.total || 1409643,
+        total: 1409643,
         hasMore: data.hasMore ?? true,
         view,
       };

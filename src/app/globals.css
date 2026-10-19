@@ -53,17 +53,18 @@ body {
 
 /* RTL Support */
 [dir="rtl"] {
-  font-family: "Cairo", "Segoe UI", Tahoma, sans-serif;
+  font-family: "Cairo", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
-[dir="rtl"] .font-mono {
-  font-family: "Fira Code", monospace;
-  direction: ltr;
-  display: inline-block;
+[dir="rtl"] input,
+[dir="rtl"] textarea {
+  text-align: right;
 }
 
-pre, code {
-  font-family: var(--font-mono);
+/* Ensure code, commands, and numbers stay readable */
+code, pre, .ltr-text {
+  direction: ltr !important;
+  text-align: left !important;
 }
 
 @keyframes carousel {

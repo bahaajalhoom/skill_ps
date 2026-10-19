@@ -49,87 +49,113 @@ export function LeaderboardTable({
         <div className="col-span-2 text-right">{t("installsCol")}</div>
       </div>
 
-      {/* Rows */}
-      <div className="divide-y divide-white/5">
-        {skills.map((skill, index) => {
-          const rank = index + 1;
-          const isCopied = copiedId === skill.id;
-
-          return (
+      {/* Rows or Skeleton Loading */}
+      {isLoading && skills.length === 0 ? (
+        <div className="divide-y divide-white/5 animate-pulse py-2">
+          {Array.from({ length: 10 }).map((_, i) => (
             <div
-              key={skill.id || `${skill.source}-${skill.skillId}-${index}`}
-              onClick={() => onSelectSkill(skill)}
-              className="group grid grid-cols-1 sm:grid-cols-12 items-center gap-2 sm:gap-4 py-3 sm:py-3.5 hover:bg-neutral-900/50 transition-colors cursor-pointer px-2 sm:px-3 rounded-lg"
+              key={`skeleton-${i}`}
+              className="grid grid-cols-1 sm:grid-cols-12 items-center gap-2 sm:gap-4 py-4 px-2 sm:px-3"
             >
-              {/* Rank */}
-              <div className="hidden sm:flex col-span-1 items-center justify-center font-mono text-sm text-neutral-500 group-hover:text-neutral-300">
-                {rank}
+              <div className="hidden sm:flex col-span-1 justify-center">
+                <div className="h-4 w-5 bg-neutral-800 rounded" />
               </div>
-
-              {/* Skill details */}
-              <div className="col-span-6 min-w-0 flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-2.5">
-                <div className="flex items-center gap-2">
-                  <span className="sm:hidden font-mono text-xs text-neutral-500">
-                    #{rank}
-                  </span>
-                  <h3 className="font-semibold text-white font-mono text-sm sm:text-base group-hover:text-emerald-400 transition-colors truncate">
-                    {skill.name}
-                  </h3>
-                  {skill.isOfficial && (
-                    <span
-                      title="Verified Official Skill"
-                      className="inline-flex text-blue-400 shrink-0"
-                    >
-                      <ShieldCheck className="w-4 h-4" />
-                    </span>
-                  )}
-                  {skill.isCustom && (
-                    <span className="px-1.5 py-0.5 text-[10px] font-mono bg-purple-500/10 text-purple-400 border border-purple-500/20 rounded">
-                      custom
-                    </span>
-                  )}
-                </div>
-                <p className="text-xs text-neutral-500 font-mono truncate">
-                  {skill.source}
-                </p>
-                {skill.description && (
-                  <p className="sm:hidden text-xs text-neutral-400 line-clamp-1 mt-0.5">
-                    {skill.description}
-                  </p>
-                )}
+              <div className="col-span-6 space-y-2">
+                <div className="h-4 w-48 bg-neutral-800 rounded" />
+                <div className="h-3 w-32 bg-neutral-900 rounded" />
               </div>
-
-              {/* Sparkline Graph */}
-              <div className="col-span-3 hidden sm:flex items-center justify-end">
-                <Sparkline data={skill.weeklyInstalls} />
+              <div className="col-span-3 hidden sm:flex justify-end">
+                <div className="h-5 w-24 bg-neutral-900 rounded" />
               </div>
-
-              {/* Installs & Copy Action */}
-              <div className="col-span-2 flex items-center justify-between sm:justify-end gap-3 font-mono text-xs sm:text-sm text-neutral-300">
-                <span className="font-medium text-white">
-                  {formatInstalls(skill.installs)}
-                </span>
-
-                <button
-                  onClick={(e) => handleCopyCommand(e, skill)}
-                  title={isCopied ? t("copied") : t("copyCommand")}
-                  className={`p-1.5 rounded border transition-all ${
-                    isCopied
-                      ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/40"
-                      : "bg-neutral-900 border-white/10 text-neutral-400 hover:text-white hover:border-white/30"
-                  }`}
-                >
-                  {isCopied ? (
-                    <Check className="w-3.5 h-3.5" />
-                  ) : (
-                    <Copy className="w-3.5 h-3.5" />
-                  )}
-                </button>
+              <div className="col-span-2 flex justify-end gap-2">
+                <div className="h-4 w-12 bg-neutral-800 rounded" />
+                <div className="h-6 w-6 bg-neutral-900 rounded" />
               </div>
             </div>
-          );
-        })}
-      </div>
+          ))}
+        </div>
+      ) : (
+        <div className="divide-y divide-white/5">
+          {skills.map((skill, index) => {
+            const rank = index + 1;
+            const isCopied = copiedId === skill.id;
+
+            return (
+              <div
+                key={skill.id || `${skill.source}-${skill.skillId}-${index}`}
+                onClick={() => onSelectSkill(skill)}
+                className="group grid grid-cols-1 sm:grid-cols-12 items-center gap-2 sm:gap-4 py-3 sm:py-3.5 hover:bg-neutral-900/50 transition-colors cursor-pointer px-2 sm:px-3 rounded-lg"
+              >
+                {/* Rank */}
+                <div className="hidden sm:flex col-span-1 items-center justify-center font-mono text-sm text-neutral-500 group-hover:text-neutral-300">
+                  {rank}
+                </div>
+
+                {/* Skill details */}
+                <div className="col-span-6 min-w-0 flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-2.5">
+                  <div className="flex items-center gap-2">
+                    <span className="sm:hidden font-mono text-xs text-neutral-500">
+                      #{rank}
+                    </span>
+                    <h3 className="font-semibold text-white font-mono text-sm sm:text-base group-hover:text-emerald-400 transition-colors truncate">
+                      {skill.name}
+                    </h3>
+                    {skill.isOfficial && (
+                      <span
+                        title="Verified Official Skill"
+                        className="inline-flex text-blue-400 shrink-0"
+                      >
+                        <ShieldCheck className="w-4 h-4" />
+                      </span>
+                    )}
+                    {skill.isCustom && (
+                      <span className="px-1.5 py-0.5 text-[10px] font-mono bg-purple-500/10 text-purple-400 border border-purple-500/20 rounded">
+                        custom
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-xs text-neutral-500 font-mono truncate">
+                    {skill.source}
+                  </p>
+                  {skill.description && (
+                    <p className="sm:hidden text-xs text-neutral-400 line-clamp-1 mt-0.5">
+                      {skill.description}
+                    </p>
+                  )}
+                </div>
+
+                {/* Sparkline Graph */}
+                <div className="col-span-3 hidden sm:flex items-center justify-end">
+                  <Sparkline data={skill.weeklyInstalls} />
+                </div>
+
+                {/* Installs & Copy Action */}
+                <div className="col-span-2 flex items-center justify-between sm:justify-end gap-3 font-mono text-xs sm:text-sm text-neutral-300">
+                  <span className="font-medium text-white">
+                    {formatInstalls(skill.installs)}
+                  </span>
+
+                  <button
+                    onClick={(e) => handleCopyCommand(e, skill)}
+                    title={isCopied ? t("copied") : t("copyCommand")}
+                    className={`p-1.5 rounded border transition-all ${
+                      isCopied
+                        ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/40"
+                        : "bg-neutral-900 border-white/10 text-neutral-400 hover:text-white hover:border-white/30"
+                    }`}
+                  >
+                    {isCopied ? (
+                      <Check className="w-3.5 h-3.5" />
+                    ) : (
+                      <Copy className="w-3.5 h-3.5" />
+                    )}
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
 
       {/* Infinite Scroll / Load More trigger */}
       <div className="py-8 text-center">
@@ -137,9 +163,12 @@ export function LeaderboardTable({
           <button
             onClick={onLoadMore}
             disabled={isLoading}
-            className="px-6 py-2 rounded-md bg-neutral-900 border border-white/10 hover:border-white/30 text-white font-mono text-xs transition-all hover:bg-neutral-800 disabled:opacity-50"
+            className="px-6 py-2 rounded-md bg-neutral-900 border border-white/10 hover:border-white/30 text-white font-mono text-xs transition-all hover:bg-neutral-800 disabled:opacity-50 inline-flex items-center gap-2"
           >
-            {isLoading ? t("loadMore") : "Load More Skills ↓"}
+            {isLoading && (
+              <span className="w-3 h-3 rounded-full border-2 border-emerald-400 border-t-transparent animate-spin" />
+            )}
+            <span>{isLoading ? t("loadMore") : "Load More Skills ↓"}</span>
           </button>
         ) : skills.length > 0 ? (
           <p className="text-xs font-mono text-neutral-600">

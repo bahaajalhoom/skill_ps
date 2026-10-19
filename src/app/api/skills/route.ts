@@ -21,8 +21,8 @@ export async function GET(request: NextRequest) {
 
   const liveData = await fetchLiveSkills(view, page);
 
-  // If on page 0 and in all-time view, we can also prepend custom skills if any exist
-  if (page === 0) {
+  // If on page 0 and in all-time view, prepend custom skills if any exist
+  if (page === 0 && view === "all-time") {
     const custom = await getCustomSkills();
     if (custom.length > 0) {
       liveData.skills = [...custom, ...liveData.skills];
