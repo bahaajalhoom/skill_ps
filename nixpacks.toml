@@ -1,0 +1,12 @@
+# Nixpacks configuration for Dokku / Coolify / Railway
+[phases.setup]
+nixPkgs = ["nodejs_22", "npm-10_x"]
+
+[phases.install]
+cmds = ["npm ci --legacy-peer-deps || npm install --legacy-peer-deps"]
+
+[phases.build]
+cmds = ["npm run build"]
+
+[start]
+cmd = "npx next start -H 0.0.0.0 -p ${PORT:-3000}"
