@@ -8,8 +8,8 @@ import { useLanguage } from "@/context/LanguageContext";
 import { PalestineFlag } from "./PalestineFlag";
 
 interface NavbarProps {
-  onOpenSearch: () => void;
-  onOpenAddModal: () => void;
+  onOpenSearch?: () => void;
+  onOpenAddModal?: () => void;
 }
 
 export function Navbar({ onOpenSearch, onOpenAddModal }: NavbarProps) {
@@ -20,7 +20,7 @@ export function Navbar({ onOpenSearch, onOpenAddModal }: NavbarProps) {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "/" && !["INPUT", "TEXTAREA"].includes((e.target as HTMLElement)?.tagName)) {
         e.preventDefault();
-        onOpenSearch();
+        onOpenSearch?.();
       }
     };
     window.addEventListener("keydown", handleKeyDown);
@@ -42,6 +42,13 @@ export function Navbar({ onOpenSearch, onOpenAddModal }: NavbarProps) {
           <span className="hidden sm:inline-flex items-center px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
             {lang === "ar" ? "المنظومة الحية" : "Live Ecosystem"}
           </span>
+          <Link
+            href="/agent"
+            className="hidden md:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-mono text-neutral-400 hover:text-white hover:bg-neutral-900/80 border border-transparent hover:border-neutral-800 transition-colors"
+          >
+            <span className="text-emerald-400">🤖</span>
+            <span>{lang === "ar" ? "الوكلاء" : "Agents"}</span>
+          </Link>
         </div>
 
         {/* Global Search Bar (Trigger) */}

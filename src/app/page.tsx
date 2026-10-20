@@ -251,9 +251,5 @@ function HomePageContent() {
 }
 
 export default function HomePage() {
-  return (
-    <LanguageProvider>
-      <HomePageContent />
-    </LanguageProvider>
-  );
+  return <HomePageContent />;
 }

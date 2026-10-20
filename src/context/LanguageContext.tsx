@@ -7,6 +7,7 @@ type Language = "en" | "ar";
 interface LanguageContextType {
   lang: Language;
   dir: "ltr" | "rtl";
+  isRtl: boolean;
   toggleLanguage: () => void;
   t: (key: string) => string;
 }
@@ -95,6 +96,7 @@ const translations: Record<Language, Record<string, string>> = {
 const LanguageContext = createContext<LanguageContextType>({
   lang: "en",
   dir: "ltr",
+  isRtl: false,
   toggleLanguage: () => {},
   t: (key) => key,
 });
@@ -107,6 +109,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
   };
 
   const dir = lang === "ar" ? "rtl" : "ltr";
+  const isRtl = dir === "rtl";
 
   useEffect(() => {
     document.documentElement.lang = lang;
@@ -118,7 +121,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <LanguageContext.Provider value={{ lang, dir, toggleLanguage, t }}>
+    <LanguageContext.Provider value={{ lang, dir, isRtl, toggleLanguage, t }}>
       {children}
     </LanguageContext.Provider>
   );

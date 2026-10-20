@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { LanguageProvider } from "@/context/LanguageContext";
 
 export const metadata: Metadata = {
   title: "Skills — The Agent Skills Directory",
@@ -25,7 +26,7 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-screen bg-black text-foreground antialiased selection:bg-neutral-800 selection:text-white">
-        {children}
+        <LanguageProvider>{children}</LanguageProvider>
       </body>
     </html>
   );
