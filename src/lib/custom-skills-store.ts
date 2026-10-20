@@ -38,13 +38,9 @@ async function ensureStoreExists(): Promise<void> {
     await fs.mkdir(DATA_DIR, { recursive: true });
     try {
       await fs.access(STORE_FILE);
-      // Check if file is empty
-      const content = await fs.readFile(STORE_FILE, "utf-8");
-      if (!content.trim() || content.trim() === "[]") {
-        await fs.writeFile(STORE_FILE, JSON.stringify(DEFAULT_CUSTOM_SKILLS, null, 2), "utf-8");
-      }
+      // File exists - preserve existing server data!
     } catch {
-      await fs.writeFile(STORE_FILE, JSON.stringify(DEFAULT_CUSTOM_SKILLS, null, 2), "utf-8");
+      await fs.writeFile(STORE_FILE, JSON.stringify([], null, 2), "utf-8");
     }
   } catch (err) {
     console.error("Error initializing custom skills store:", err);
@@ -56,14 +52,9 @@ async function readStore(): Promise<StoredCustomSkill[]> {
   try {
     const raw = await fs.readFile(STORE_FILE, "utf-8");
     const parsed = JSON.parse(raw);
-    if (!Array.isArray(parsed) || parsed.length === 0) {
-      // Re-seed if empty
-      await writeStore(DEFAULT_CUSTOM_SKILLS);
-      return DEFAULT_CUSTOM_SKILLS;
-    }
-    return parsed;
+    return Array.isArray(parsed) ? parsed : [];
   } catch {
-    return DEFAULT_CUSTOM_SKILLS;
+    return [];
   }
 }
 

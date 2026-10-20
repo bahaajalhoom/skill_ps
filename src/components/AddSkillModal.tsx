@@ -63,6 +63,18 @@ export function AddSkillModal({ isOpen, onClose, onSkillAdded }: AddSkillModalPr
         throw new Error(data.error || "Failed to import skill");
       }
 
+      const importedSkill = await res.json();
+      if (typeof window !== "undefined") {
+        try {
+          const stored = JSON.parse(localStorage.getItem("skillps_user_skills") || "[]");
+          const skillObj = importedSkill.skill || importedSkill;
+          if (!stored.some((s: any) => s.id === skillObj.id)) {
+            stored.unshift(skillObj);
+            localStorage.setItem("skillps_user_skills", JSON.stringify(stored));
+          }
+        } catch {}
+      }
+
       setSuccess(true);
       setTimeout(() => {
         onSkillAdded();
@@ -102,6 +114,18 @@ export function AddSkillModal({ isOpen, onClose, onSkillAdded }: AddSkillModalPr
       if (!res.ok) {
         const data = await res.json();
         throw new Error(data.error || "Failed to create skill");
+      }
+
+      const createdSkill = await res.json();
+      if (typeof window !== "undefined") {
+        try {
+          const stored = JSON.parse(localStorage.getItem("skillps_user_skills") || "[]");
+          const skillObj = createdSkill.skill || createdSkill;
+          if (!stored.some((s: any) => s.id === skillObj.id)) {
+            stored.unshift(skillObj);
+            localStorage.setItem("skillps_user_skills", JSON.stringify(stored));
+          }
+        } catch {}
       }
 
       setSuccess(true);

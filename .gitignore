@@ -32,6 +32,10 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# data
-.data/*
-!.data/custom-skills.json
+# runtime data - never track or overwrite server database
+.data/
+data/
+*.db
+*.db-journal
+*.db-wal
+*.db-shm

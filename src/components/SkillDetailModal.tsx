@@ -109,7 +109,11 @@ export function SkillDetailModal({ skill, onClose, onSkillInstall }: SkillDetail
                 <InstallCommandCard
                   commands={detail.installCommands}
                   skillName={detail.name}
-                  onInstall={() => onSkillInstall?.(skill.id)}
+                  onInstall={() => {
+                    if (skill.isCustom && onSkillInstall) {
+                      onSkillInstall(skill.id);
+                    }
+                  }}
                 />
               </div>
 

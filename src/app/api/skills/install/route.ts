@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { incrementCustomSkillInstalls, getCustomSkillById } from "@/lib/custom-skills-store";
+import { incrementCustomSkillInstalls } from "@/lib/custom-skills-store";
 
 export async function POST(request: NextRequest) {
   try {
@@ -10,6 +10,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Skill ID is required" }, { status: 400 });
     }
 
+    // Only custom skills support dynamic local install increments
     const updated = await incrementCustomSkillInstalls(id);
     if (updated) {
       return NextResponse.json({
@@ -20,11 +21,10 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // If not a custom skill, return success with simulated increment
+    // For official/ecosystem skills, do NOT alter their verified install numbers
     return NextResponse.json({
-      success: true,
-      id,
-      installs: (body.currentInstalls || 0) + 1,
+      success: false,
+      message: "Ecosystem skill installs are tracked upstream and cannot be overwritten.",
     });
   } catch (err) {
     return NextResponse.json(

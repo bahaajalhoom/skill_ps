@@ -33,7 +33,10 @@ export function LeaderboardTable({
     setCopiedId(skill.id);
     setTimeout(() => setCopiedId(null), 2000);
 
-    onSkillInstall?.(skill.id);
+    // ONLY increment dynamic install counter for custom skills
+    if (skill.isCustom && onSkillInstall) {
+      onSkillInstall(skill.id);
+    }
   };
 
   const formatInstalls = (num: number): string => {

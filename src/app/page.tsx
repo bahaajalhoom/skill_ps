@@ -46,7 +46,27 @@ function HomePageContent() {
         const res = await apiFetch(`/api/skills?view=${view}&page=${pageNum}`);
         if (res.ok) {
           const data = await res.json();
-          const newSkills = Array.isArray(data.skills) ? data.skills : [];
+          let newSkills: SkillLeaderboardItem[] = Array.isArray(data.skills) ? data.skills : [];
+
+          // For custom view: merge server skills with browser-persisted custom skills
+          if (view === "custom" && typeof window !== "undefined") {
+            try {
+              const localRaw = localStorage.getItem("skillps_user_skills");
+              if (localRaw) {
+                const localList = JSON.parse(localRaw);
+                if (Array.isArray(localList)) {
+                  const map = new Map<string, SkillLeaderboardItem>();
+                  for (const s of localList) {
+                    if (s && s.id) map.set(s.id, s);
+                  }
+                  for (const s of newSkills) {
+                    if (s && s.id) map.set(s.id, s);
+                  }
+                  newSkills = Array.from(map.values());
+                }
+              }
+            } catch {}
+          }
           
           setSkills((prev) => {
             const updated = append ? [...prev, ...newSkills] : newSkills;
@@ -107,10 +127,10 @@ function HomePageContent() {
   };
 
   const handleSkillInstall = useCallback(async (skillId: string) => {
-    // 1. Optimistically increment count in UI immediately
+    // 1. ONLY increment for custom skills
     setSkills((prev) =>
       prev.map((s) => {
-        if (s.id === skillId || s.skillId === skillId) {
+        if (s.isCustom && (s.id === skillId || s.skillId === skillId)) {
           const nextInstalls = (s.installs || 0) + 1;
           const weekly =
             Array.isArray(s.weeklyInstalls) && s.weeklyInstalls.length > 0
@@ -136,10 +156,10 @@ function HomePageContent() {
       });
       if (res.ok) {
         const data = await res.json();
-        if (typeof data.installs === "number") {
+        if (data.success && typeof data.installs === "number") {
           setSkills((prev) =>
             prev.map((s) => {
-              if (s.id === skillId || s.skillId === skillId) {
+              if (s.isCustom && (s.id === skillId || s.skillId === skillId)) {
                 return {
                   ...s,
                   installs: data.installs,
