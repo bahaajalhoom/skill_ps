@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { addCustomSkill, getCustomSkills, deleteCustomSkill } from "@/lib/custom-skills-store";
+import { addCustomSkill, getCustomSkills, deleteCustomSkill, incrementCustomSkillInstalls } from "@/lib/custom-skills-store";
 import { CustomSkillInput } from "@/types/skills";
 
 export async function GET() {
@@ -46,4 +46,27 @@ export async function DELETE(request: NextRequest) {
 
   const success = await deleteCustomSkill(id);
   return NextResponse.json({ success });
+}
+
+export async function PATCH(request: NextRequest) {
+  try {
+    const body = await request.json();
+    const id = body.id || body.skillId;
+
+    if (!id) {
+      return NextResponse.json({ error: "Skill ID is required" }, { status: 400 });
+    }
+
+    const updated = await incrementCustomSkillInstalls(id);
+    if (!updated) {
+      return NextResponse.json({ error: "Skill not found" }, { status: 404 });
+    }
+
+    return NextResponse.json({ success: true, skill: updated });
+  } catch (err) {
+    return NextResponse.json(
+      { error: (err as Error).message || "Failed to update installs" },
+      { status: 500 }
+    );
+  }
 }

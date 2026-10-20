@@ -106,6 +106,56 @@ function HomePageContent() {
     setTimeout(() => setCopiedTryCommand(false), 2000);
   };
 
+  const handleSkillInstall = useCallback(async (skillId: string) => {
+    // 1. Optimistically increment count in UI immediately
+    setSkills((prev) =>
+      prev.map((s) => {
+        if (s.id === skillId || s.skillId === skillId) {
+          const nextInstalls = (s.installs || 0) + 1;
+          const weekly =
+            Array.isArray(s.weeklyInstalls) && s.weeklyInstalls.length > 0
+              ? [...s.weeklyInstalls]
+              : [0, 0, 0, 0, 0, 0, 0, 0];
+          weekly[weekly.length - 1] = (weekly[weekly.length - 1] || 0) + 1;
+          return {
+            ...s,
+            installs: nextInstalls,
+            weeklyInstalls: weekly,
+          };
+        }
+        return s;
+      })
+    );
+
+    // 2. Persist to API
+    try {
+      const res = await apiFetch("/api/skills/install", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: skillId }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (typeof data.installs === "number") {
+          setSkills((prev) =>
+            prev.map((s) => {
+              if (s.id === skillId || s.skillId === skillId) {
+                return {
+                  ...s,
+                  installs: data.installs,
+                  weeklyInstalls: data.weeklyInstalls || s.weeklyInstalls,
+                };
+              }
+              return s;
+            })
+          );
+        }
+      }
+    } catch (err) {
+      console.error("Failed to record skill install:", err);
+    }
+  }, []);
+
   return (
     <div className="min-h-screen bg-black text-white flex flex-col">
       <Navbar
@@ -203,6 +253,7 @@ function HomePageContent() {
             hasMore={hasMore}
             onLoadMore={handleLoadMore}
             onSelectSkill={(skill) => setSelectedSkill(skill)}
+            onSkillInstall={handleSkillInstall}
           />
         </section>
       </main>
@@ -239,6 +290,7 @@ function HomePageContent() {
       <SkillDetailModal
         skill={selectedSkill}
         onClose={() => setSelectedSkill(null)}
+        onSkillInstall={handleSkillInstall}
       />
 
       <AddSkillModal

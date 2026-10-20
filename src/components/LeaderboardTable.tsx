@@ -12,6 +12,7 @@ interface LeaderboardTableProps {
   hasMore: boolean;
   onLoadMore: () => void;
   onSelectSkill: (skill: SkillLeaderboardItem) => void;
+  onSkillInstall?: (skillId: string) => void;
 }
 
 export function LeaderboardTable({
@@ -20,6 +21,7 @@ export function LeaderboardTable({
   hasMore,
   onLoadMore,
   onSelectSkill,
+  onSkillInstall,
 }: LeaderboardTableProps) {
   const { t } = useLanguage();
   const [copiedId, setCopiedId] = useState<string | null>(null);
@@ -30,13 +32,15 @@ export function LeaderboardTable({
     navigator.clipboard.writeText(cmd);
     setCopiedId(skill.id);
     setTimeout(() => setCopiedId(null), 2000);
+
+    onSkillInstall?.(skill.id);
   };
 
   const formatInstalls = (num: number): string => {
-    if (!num) return "1.2K";
+    if (typeof num !== "number" || isNaN(num)) return "0";
     if (num >= 1_000_000) return `${(num / 1_000_000).toFixed(1)}M`;
-    if (num >= 1_000) return `${(num / 1_000).toFixed(1)}K`;
-    return num.toString();
+    if (num >= 10_000) return `${(num / 1_000).toFixed(1)}K`;
+    return num.toLocaleString();
   };
 
   return (

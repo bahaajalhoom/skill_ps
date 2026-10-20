@@ -12,9 +12,10 @@ import { apiFetch } from "@/lib/api-config";
 interface SkillDetailModalProps {
   skill: SkillLeaderboardItem | null;
   onClose: () => void;
+  onSkillInstall?: (skillId: string) => void;
 }
 
-export function SkillDetailModal({ skill, onClose }: SkillDetailModalProps) {
+export function SkillDetailModal({ skill, onClose, onSkillInstall }: SkillDetailModalProps) {
   const { t } = useLanguage();
   const [detail, setDetail] = useState<SkillDetail | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -108,6 +109,7 @@ export function SkillDetailModal({ skill, onClose }: SkillDetailModalProps) {
                 <InstallCommandCard
                   commands={detail.installCommands}
                   skillName={detail.name}
+                  onInstall={() => onSkillInstall?.(skill.id)}
                 />
               </div>
 

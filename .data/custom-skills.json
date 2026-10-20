@@ -1,0 +1,28 @@
+[
+  {
+    "id": "yousefnaim/yousefnaim-protofolio/yousefnaim-protofolio",
+    "source": "yousefnaim/yousefnaim-protofolio",
+    "skillId": "yousefnaim-protofolio",
+    "name": "yousefnaim-protofolio",
+    "installs": 3,
+    "weeklyInstalls": [
+      1,
+      2,
+      3,
+      5,
+      8,
+      12,
+      18,
+      27
+    ],
+    "isOfficial": false,
+    "isCustom": true,
+    "description": "Imported skill from https://github.com/yousefnaim/yousefnaim-protofolio",
+    "category": "imported",
+    "markdownContent": "# yousefnaim-protofolio\n\nImported from [yousefnaim/yousefnaim-protofolio](https://github.com/yousefnaim/yousefnaim-protofolio).\n\nRun:\n```bash\nnpx skills add https://github.com/yousefnaim/yousefnaim-protofolio --skill yousefnaim-protofolio\n```",
+    "createdAt": "2026-10-19T20:45:25.330Z",
+    "updatedAt": "2026-10-20T21:28:49.689Z",
+    "stars": 1,
+    "repoUrl": "https://github.com/yousefnaim/yousefnaim-protofolio"
+  }
+]
