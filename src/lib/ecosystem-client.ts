@@ -180,6 +180,12 @@ npx skills add ${repoUrl} --skill ${skillId}
   // Generate multi-agent install commands
   const installCommands = generateInstallCommands(source, skillId, repoUrl);
 
+  const foundSeed = SEED_SKILLS.find(
+    (s) => s.id === `${source}/${skillId}` || s.skillId === skillId || s.name === skillId
+  );
+  const installs = foundSeed?.installs ?? 395000;
+  const weeklyInstalls = foundSeed?.weeklyInstalls ?? [12000, 13500, 14200, 15800, 17200, 18900, 20400, 22100];
+
   return {
     id: `${source}/${skillId}`,
     source,
@@ -187,10 +193,10 @@ npx skills add ${repoUrl} --skill ${skillId}
     name: skillId,
     author: owner,
     repoUrl,
-    installs: 154200,
-    weeklyInstalls: [12000, 13500, 14200, 15800, 17200, 18900, 20400, 22100],
-    isOfficial: owner === "vercel-labs" || owner === "anthropics" || owner === "cloudflare",
-    description: `An installable capability and workflow for AI agents, published by ${source}.`,
+    installs,
+    weeklyInstalls,
+    isOfficial: foundSeed?.isOfficial ?? (owner === "vercel-labs" || owner === "anthropics" || owner === "cloudflare"),
+    description: foundSeed?.description || `An installable capability and workflow for AI agents, published by ${source}.`,
     category: categorizeSkill(skillId, source),
     markdownContent,
     agentCompatibility: ["Claude Code", "Cursor", "Antigravity", "Windsurf", "Copilot", "Zed", "OpenClaw"],

@@ -25,7 +25,17 @@ export async function GET(request: NextRequest) {
   if (page === 0 && view === "all-time") {
     const custom = await getCustomSkills();
     if (custom.length > 0) {
-      liveData.skills = [...custom, ...liveData.skills];
+      // DEDUPLICATE: Filter out any custom skill that collides with an official ecosystem skill!
+      const safeCustom = custom.filter(
+        (c) =>
+          c.isCustom &&
+          !liveData.skills.some(
+            (s) => s.id === c.id || s.name.toLowerCase() === c.name.toLowerCase()
+          )
+      );
+      if (safeCustom.length > 0) {
+        liveData.skills = [...safeCustom, ...liveData.skills];
+      }
     }
   }
 

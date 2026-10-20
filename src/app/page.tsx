@@ -57,7 +57,10 @@ function HomePageContent() {
                 if (Array.isArray(localList)) {
                   const map = new Map<string, SkillLeaderboardItem>();
                   for (const s of localList) {
-                    if (s && s.id) map.set(s.id, s);
+                    // Only keep legitimate custom skills, never store or override official ones
+                    if (s && s.id && s.isCustom && s.source !== "vercel-labs/skills") {
+                      map.set(s.id, s);
+                    }
                   }
                   for (const s of newSkills) {
                     if (s && s.id) map.set(s.id, s);
@@ -126,55 +129,66 @@ function HomePageContent() {
     setTimeout(() => setCopiedTryCommand(false), 2000);
   };
 
-  const handleSkillInstall = useCallback(async (skillId: string) => {
-    // 1. ONLY increment for custom skills
-    setSkills((prev) =>
-      prev.map((s) => {
-        if (s.isCustom && (s.id === skillId || s.skillId === skillId)) {
-          const nextInstalls = (s.installs || 0) + 1;
-          const weekly =
-            Array.isArray(s.weeklyInstalls) && s.weeklyInstalls.length > 0
-              ? [...s.weeklyInstalls]
-              : [0, 0, 0, 0, 0, 0, 0, 0];
-          weekly[weekly.length - 1] = (weekly[weekly.length - 1] || 0) + 1;
-          return {
-            ...s,
-            installs: nextInstalls,
-            weeklyInstalls: weekly,
-          };
-        }
-        return s;
-      })
-    );
-
-    // 2. Persist to API
-    try {
-      const res = await apiFetch("/api/skills/install", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: skillId }),
-      });
-      if (res.ok) {
-        const data = await res.json();
-        if (data.success && typeof data.installs === "number") {
-          setSkills((prev) =>
-            prev.map((s) => {
-              if (s.isCustom && (s.id === skillId || s.skillId === skillId)) {
-                return {
-                  ...s,
-                  installs: data.installs,
-                  weeklyInstalls: data.weeklyInstalls || s.weeklyInstalls,
-                };
-              }
-              return s;
-            })
-          );
-        }
+  const handleSkillInstall = useCallback(
+    async (skillId: string) => {
+      // 1. HARD GUARD: ONLY allow incrementing custom skills!
+      const targetSkill = skills.find(
+        (s) => s.isCustom && (s.id === skillId || s.skillId === skillId)
+      );
+      if (!targetSkill) {
+        return;
       }
-    } catch (err) {
-      console.error("Failed to record skill install:", err);
-    }
-  }, []);
+
+      // 2. Optimistically increment count in UI immediately for this custom skill only
+      setSkills((prev) =>
+        prev.map((s) => {
+          if (s.isCustom && (s.id === skillId || s.skillId === skillId)) {
+            const nextInstalls = (s.installs || 0) + 1;
+            const weekly =
+              Array.isArray(s.weeklyInstalls) && s.weeklyInstalls.length > 0
+                ? [...s.weeklyInstalls]
+                : [0, 0, 0, 0, 0, 0, 0, 0];
+            weekly[weekly.length - 1] = (weekly[weekly.length - 1] || 0) + 1;
+            return {
+              ...s,
+              installs: nextInstalls,
+              weeklyInstalls: weekly,
+            };
+          }
+          return s;
+        })
+      );
+
+      // 3. Persist to API
+      try {
+        const res = await apiFetch("/api/skills/install", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id: skillId }),
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (data.success && typeof data.installs === "number" && data.installs > 0) {
+            setSkills((prev) =>
+              prev.map((s) => {
+                if (s.isCustom && (s.id === skillId || s.skillId === skillId)) {
+                  return {
+                    ...s,
+                    installs: data.installs,
+                    weeklyInstalls: data.weeklyInstalls || s.weeklyInstalls,
+                  };
+                }
+                return s;
+              })
+            );
+          }
+        }
+      } catch (err) {
+        console.error("Failed to record skill install:", err);
+      }
+    },
+    [skills]
+  );
 
   return (
     <div className="min-h-screen bg-black text-white flex flex-col">
