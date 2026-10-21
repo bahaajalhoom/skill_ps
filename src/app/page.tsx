@@ -14,6 +14,7 @@ import { LeaderboardView, SkillLeaderboardItem } from "@/types/skills";
 import { Copy, Check, Terminal, Search } from "lucide-react";
 
 import { apiFetch } from "@/lib/api-config";
+import { getDynamicDeviceIdentity } from "@/lib/geo-utils";
 
 function HomePageContent() {
   const { t } = useLanguage();
@@ -161,18 +162,10 @@ function HomePageContent() {
 
       // 3. Persist to API with telemetry details
       try {
+        // Dynamically detect client hardware identity (GPU, OS, CPU cores) without static values
         let deviceUser = "";
         try {
-          if (typeof window !== "undefined") {
-            const saved = localStorage.getItem("skillps_device_user");
-            if (saved && !saved.match(/^.+User-[a-z0-9]{4}$/i)) {
-              deviceUser = saved;
-            } else {
-              const isMac = navigator.userAgent.includes("Mac");
-              deviceUser = isMac ? "saleh" : "client-user";
-              localStorage.setItem("skillps_device_user", deviceUser);
-            }
-          }
+          deviceUser = getDynamicDeviceIdentity();
         } catch {}
 
         const res = await apiFetch("/api/skills/install", {

@@ -75,3 +75,72 @@ export function parseNextUserAgent(ua: string | null): {
 
   return { browser, os, device };
 }
+
+/**
+ * Dynamically detects client device hardware identity without any hardcoding or random values.
+ * Extracts real GPU chipset (WebGL), CPU cores, and OS platform.
+ */
+export function getDynamicDeviceIdentity(): string {
+  if (typeof window === "undefined" || typeof navigator === "undefined") {
+    return "Server/CLI";
+  }
+
+  // 1. Check if user explicitly set their name in localStorage
+  try {
+    const custom = localStorage.getItem("skillps_device_user");
+    if (custom && custom.trim() && !custom.match(/^.+User-[a-z0-9]{4}$/i) && custom !== "client-user") {
+      return custom.trim();
+    }
+  } catch {}
+
+  // 2. Extract real GPU renderer via WebGL (e.g. "Apple M1", "Intel Iris Xe", "NVIDIA RTX 3070")
+  let gpu = "";
+  try {
+    const canvas = document.createElement("canvas");
+    const gl =
+      canvas.getContext("webgl") ||
+      (canvas.getContext("experimental-webgl") as WebGLRenderingContext | null);
+    if (gl) {
+      const debugInfo = gl.getExtension("WEBGL_debug_renderer_info");
+      if (debugInfo) {
+        const rawGpu = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
+        if (typeof rawGpu === "string" && rawGpu) {
+          gpu = rawGpu
+            .replace(/ANGLE \((.*)\)/, "$1")
+            .replace(/Direct3D.*/, "")
+            .replace(/OpenGL Engine.*/, "")
+            .replace(/vs_\d+_\d+.*|ps_\d+_\d+.*/, "")
+            .trim();
+        }
+      }
+    }
+  } catch {}
+
+  // 3. Extract CPU cores
+  const cores =
+    typeof navigator.hardwareConcurrency === "number" && navigator.hardwareConcurrency > 0
+      ? `${navigator.hardwareConcurrency}c`
+      : "";
+
+  // 4. Extract OS & platform
+  const ua = navigator.userAgent || "";
+  let os = "Desktop";
+  if (ua.includes("Mac")) os = "macOS";
+  else if (ua.includes("Win")) os = "Windows";
+  else if (ua.includes("Linux")) os = "Linux";
+  else if (ua.includes("Android")) os = "Android";
+  else if (ua.includes("iPhone") || ua.includes("iPad")) os = "iOS";
+
+  // Build clean dynamic hardware identity
+  const parts: string[] = [];
+  if (gpu && gpu !== "Generic" && !gpu.toLowerCase().includes("swiftshader")) {
+    parts.push(gpu);
+  }
+  parts.push(os);
+  if (cores) {
+    parts.push(cores);
+  }
+
+  const result = parts.join(" • ");
+  return result || `${os} Device`;
+}
