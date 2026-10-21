@@ -161,10 +161,32 @@ function HomePageContent() {
 
       // 3. Persist to API with telemetry details
       try {
+        let deviceUser = "";
+        try {
+          if (typeof window !== "undefined") {
+            deviceUser = localStorage.getItem("skillps_device_user") || "";
+            if (!deviceUser) {
+              const platform = navigator.userAgent.includes("Mac")
+                ? "Mac-User"
+                : navigator.userAgent.includes("Win")
+                ? "Windows-User"
+                : navigator.userAgent.includes("Linux")
+                ? "Linux-User"
+                : navigator.userAgent.includes("Android")
+                ? "Android-User"
+                : navigator.userAgent.includes("iPhone")
+                ? "iPhone-User"
+                : "Device-User";
+              deviceUser = `${platform}-${Math.random().toString(36).substring(2, 6)}`;
+              localStorage.setItem("skillps_device_user", deviceUser);
+            }
+          }
+        } catch {}
+
         const res = await apiFetch("/api/skills/install", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ id: skillId, agentTarget }),
+          body: JSON.stringify({ id: skillId, agentTarget, deviceUser }),
         });
         if (res.ok) {
           const data = await res.json();

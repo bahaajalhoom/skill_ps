@@ -32,7 +32,7 @@ import {
 import { useLanguage } from "@/context/LanguageContext";
 import { PalestineFlag } from "@/components/PalestineFlag";
 import { InstallLog, TelemetryStats, AdminTelemetryResponse } from "@/types/skills";
-import { getCountryFlag } from "@/lib/geo";
+import { getCountryFlag } from "@/lib/geo-utils";
 import { apiFetch } from "@/lib/api-config";
 
 // ============================================================================
@@ -282,6 +282,20 @@ function TelemetryInspectionModal({
               </p>
             </div>
 
+            {/* Device User / يوزر الجهاز */}
+            <div className="p-3 rounded-lg bg-neutral-900/40 border border-white/5 space-y-1">
+              <span className="text-neutral-500 uppercase tracking-wider text-[10px]">
+                {lang === "ar" ? "يوزر الجهاز" : "Device User / Hostname"}
+              </span>
+              <p className="font-semibold text-purple-400 font-mono text-sm flex items-center gap-1.5 truncate">
+                <Laptop className="w-3.5 h-3.5 shrink-0" />
+                <span>{log.deviceUser || "unknown"}</span>
+              </p>
+              <p className="text-[11px] text-neutral-400 truncate">
+                Client / Machine identity
+              </p>
+            </div>
+
             {/* Timestamp */}
             <div className="p-3 rounded-lg bg-neutral-900/40 border border-white/5 space-y-1">
               <span className="text-neutral-500 uppercase tracking-wider text-[10px]">
@@ -424,6 +438,7 @@ export default function AdminPage() {
         log.skillName.toLowerCase().includes(q) ||
         log.source.toLowerCase().includes(q) ||
         log.ip.toLowerCase().includes(q) ||
+        (log.deviceUser && log.deviceUser.toLowerCase().includes(q)) ||
         log.country.toLowerCase().includes(q) ||
         log.city.toLowerCase().includes(q) ||
         log.browser.toLowerCase().includes(q) ||
@@ -468,6 +483,7 @@ export default function AdminPage() {
       "Skill Name",
       "Source",
       "IP",
+      "Device User",
       "Country",
       "City",
       "Timestamp",
@@ -481,6 +497,7 @@ export default function AdminPage() {
       `"${l.skillName}"`,
       `"${l.source}"`,
       l.ip,
+      `"${l.deviceUser || ""}"`,
       `"${l.country}"`,
       `"${l.city}"`,
       l.createdAt,
@@ -689,13 +706,16 @@ export default function AdminPage() {
         {/* 3. TELEMETRY EVENT LOG TABLE */}
         <div className="rounded-xl bg-neutral-950 border border-white/10 overflow-hidden shadow-2xl">
           {/* Table Header */}
-          <div className="hidden lg:grid grid-cols-12 gap-3 p-3.5 border-b border-white/10 bg-neutral-900/60 font-mono text-xs font-semibold text-neutral-400 uppercase tracking-wider">
-            <div className="col-span-3">{t("adminLocation")}</div>
+          <div className="hidden lg:grid grid-cols-12 gap-2.5 p-3.5 border-b border-white/10 bg-neutral-900/60 font-mono text-xs font-semibold text-neutral-400 uppercase tracking-wider items-center">
+            <div className="col-span-2">{t("adminLocation")}</div>
             <div className="col-span-2">{t("adminIp")}</div>
+            <div className="col-span-2 flex items-center gap-1.5 text-purple-400">
+              <Laptop className="w-3.5 h-3.5" />
+              <span>{t("adminDeviceUser")}</span>
+            </div>
             <div className="col-span-2">{t("adminTime")}</div>
             <div className="col-span-2">{lang === "ar" ? "السكل المخصص" : "Custom Skill"}</div>
             <div className="col-span-1">{t("adminAgent")}</div>
-            <div className="col-span-1">{t("adminEnvironment")}</div>
             <div className="col-span-1 text-right">{t("adminInspect")}</div>
           </div>
 
@@ -736,29 +756,28 @@ export default function AdminPage() {
                   <div
                     key={log.id}
                     onClick={() => setInspectedLog(log)}
-                    className="grid grid-cols-1 lg:grid-cols-12 gap-2 lg:gap-3 p-3.5 hover:bg-neutral-900/60 transition-colors cursor-pointer items-center group"
+                    className="grid grid-cols-1 lg:grid-cols-12 gap-2 lg:gap-2.5 p-3.5 hover:bg-neutral-900/60 transition-colors cursor-pointer items-center group"
                   >
-                    {/* Location & City */}
-                    <div className="col-span-3 flex items-center gap-2.5 min-w-0">
-                      <span className="text-lg shrink-0">{flag}</span>
+                    {/* Location & City (col-span-2) */}
+                    <div className="col-span-2 flex items-center gap-2 min-w-0">
+                      <span className="text-base shrink-0">{flag}</span>
                       <div className="min-w-0">
-                        <div className="font-semibold text-white group-hover:text-purple-300 transition-colors truncate flex items-center gap-1.5">
-                          <span>{log.country}</span>
+                        <div className="font-semibold text-white group-hover:text-purple-300 transition-colors truncate flex items-center gap-1">
+                          <span className="truncate">{log.country}</span>
                           {log.countryCode && (
-                            <span className="text-[10px] text-neutral-500">[{log.countryCode}]</span>
+                            <span className="text-[10px] text-neutral-500 shrink-0">[{log.countryCode}]</span>
                           )}
                         </div>
                         <div className="text-[11px] text-neutral-400 truncate flex items-center gap-1">
                           <MapPin className="w-3 h-3 text-neutral-500 shrink-0" />
-                          <span>{log.city || "Unknown City"}</span>
-                          {log.region && <span className="text-neutral-600">• {log.region}</span>}
+                          <span className="truncate">{log.city || "Unknown City"}</span>
                         </div>
                       </div>
                     </div>
 
-                    {/* Network / IP with Copy */}
-                    <div className="col-span-2 flex items-center justify-between lg:justify-start gap-2">
-                      <span className="font-mono text-emerald-400 font-medium tracking-tight">
+                    {/* Network / IP with Copy (col-span-2) */}
+                    <div className="col-span-2 flex items-center justify-between lg:justify-start gap-1.5">
+                      <span className="font-mono text-emerald-400 font-medium tracking-tight text-xs truncate">
                         {log.ip}
                       </span>
                       <button
@@ -767,7 +786,7 @@ export default function AdminPage() {
                           handleCopyIp(log.ip);
                         }}
                         title={isIpCopied ? t("copied") : "Copy IP"}
-                        className="p-1 rounded hover:bg-white/10 text-neutral-400 hover:text-white transition-colors"
+                        className="p-1 rounded hover:bg-white/10 text-neutral-400 hover:text-white transition-colors shrink-0"
                       >
                         {isIpCopied ? (
                           <Check className="w-3 h-3 text-emerald-400" />
@@ -777,7 +796,20 @@ export default function AdminPage() {
                       </button>
                     </div>
 
-                    {/* Timestamp: Exact hour:min:sec and relative */}
+                    {/* Device User / يوزر الجهاز (col-span-2) */}
+                    <div className="col-span-2 flex items-center gap-1.5 min-w-0">
+                      <span className="p-1 rounded bg-purple-500/10 text-purple-400 border border-purple-500/20 shrink-0">
+                        <Laptop className="w-3.5 h-3.5" />
+                      </span>
+                      <span
+                        className="font-mono text-purple-300 font-semibold tracking-tight text-xs truncate"
+                        title={log.deviceUser || "unknown"}
+                      >
+                        {log.deviceUser || "unknown"}
+                      </span>
+                    </div>
+
+                    {/* Timestamp: Exact hour:min:sec and relative (col-span-2) */}
                     <div className="col-span-2 space-y-0.5">
                       <div className="text-white font-medium flex items-center gap-1">
                         <Clock className="w-3 h-3 text-neutral-500 shrink-0" />
@@ -790,10 +822,10 @@ export default function AdminPage() {
                       </div>
                     </div>
 
-                    {/* Skill Info */}
+                    {/* Skill Info (col-span-2) */}
                     <div className="col-span-2 min-w-0">
                       <div className="font-semibold text-white truncate flex items-center gap-1">
-                        <span className="text-purple-400">✦</span>
+                        <span className="text-purple-400 shrink-0">✦</span>
                         <span className="truncate">{log.skillName}</span>
                       </div>
                       <div className="text-[11px] text-neutral-500 truncate">
@@ -801,23 +833,17 @@ export default function AdminPage() {
                       </div>
                     </div>
 
-                    {/* Target Agent Badge */}
+                    {/* Target Agent Badge (col-span-1) */}
                     <div className="col-span-1">
                       <span
-                        className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] border font-medium ${agentColor.bg} ${agentColor.text} ${agentColor.border}`}
+                        className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] border font-medium ${agentColor.bg} ${agentColor.text} ${agentColor.border}`}
                       >
                         <Terminal className="w-3 h-3 shrink-0" />
                         <span className="truncate">{agentLabel}</span>
                       </span>
                     </div>
 
-                    {/* Client Environment: OS & Browser */}
-                    <div className="col-span-1 text-[11px] text-neutral-400 space-y-0.5 truncate">
-                      <div className="text-neutral-300 truncate">{log.os}</div>
-                      <div className="text-neutral-500 truncate">{log.browser}</div>
-                    </div>
-
-                    {/* Action Inspector Button */}
+                    {/* Action Inspector Button (col-span-1) */}
                     <div className="col-span-1 flex justify-end">
                       <button
                         onClick={(e) => {

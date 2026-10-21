@@ -55,6 +55,7 @@ export async function getLocalInstallLogs(
       (l) =>
         l.skillName.toLowerCase().includes(q) ||
         l.ip.toLowerCase().includes(q) ||
+        (l.deviceUser && l.deviceUser.toLowerCase().includes(q)) ||
         l.country.toLowerCase().includes(q) ||
         l.city.toLowerCase().includes(q) ||
         l.browser.toLowerCase().includes(q) ||

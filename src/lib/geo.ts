@@ -1,4 +1,9 @@
 import { NextRequest } from "next/server";
+import os from "os";
+import dns from "dns/promises";
+import { getCountryFlag, getCountryName, parseNextUserAgent } from "./geo-utils";
+
+export { getCountryFlag, getCountryName, parseNextUserAgent };
 
 export interface GeoLocation {
   country: string;
@@ -67,6 +72,65 @@ function isPrivateIp(ip: string): boolean {
     return true;
   }
   return false;
+}
+
+/**
+ * Resolves the client machine/device username (يوزر الجهاز) for Next.js.
+ */
+export async function resolveNextDeviceUser(
+  req: NextRequest | Request,
+  ip: string,
+  explicitUser?: string
+): Promise<string> {
+  // 1. Explicit user from body or custom header
+  if (explicitUser && typeof explicitUser === "string" && explicitUser.trim()) {
+    return explicitUser.trim();
+  }
+
+  const headers = req.headers;
+  const headerUser =
+    headers.get("x-device-user") ||
+    headers.get("x-client-user");
+
+  if (headerUser && headerUser.trim()) {
+    return headerUser.trim();
+  }
+
+  // 2. If client is on local machine / localhost
+  if (isPrivateIp(ip)) {
+    try {
+      const sysUser = os.userInfo().username;
+      const sysHost = os.hostname();
+      if (sysUser && sysUser !== "root") {
+        return `${sysUser}@${sysHost}`;
+      }
+      return sysHost || sysUser || "local-developer";
+    } catch {
+      const envUser = process.env.USER || process.env.USERNAME;
+      if (envUser) return envUser;
+    }
+  }
+
+  // 3. Try reverse DNS lookup on IP to get computer / host name
+  try {
+    const hostnames = await Promise.race([
+      dns.reverse(ip),
+      new Promise<string[]>((_, reject) => setTimeout(() => reject(new Error("Timeout")), 1200)),
+    ]);
+    if (Array.isArray(hostnames) && hostnames.length > 0) {
+      const host = hostnames[0].split(".")[0];
+      if (host && host.length >= 2 && !host.startsWith("ip-") && !host.startsWith("cpe-")) {
+        return host;
+      }
+    }
+  } catch {
+    // Reverse DNS timeout or residential ISP
+  }
+
+  // 4. Derive from client User-Agent and platform
+  const uaRaw = headers.get("user-agent") || "";
+  const parsed = parseNextUserAgent(uaRaw);
+  return `${parsed.os}-${parsed.device}`;
 }
 
 /**
@@ -155,75 +219,4 @@ export async function resolveNextGeo(ip: string, req?: NextRequest | Request): P
   };
   geoCache.set(ip, fallback);
   return fallback;
-}
-
-/**
- * Lightweight User-Agent parser.
- */
-export function parseNextUserAgent(ua: string): { browser: string; os: string; device: string } {
-  if (!ua) {
-    return { browser: "Skills CLI", os: "Terminal", device: "CLI" };
-  }
-
-  const lower = ua.toLowerCase();
-
-  // OS
-  let os = "Unknown OS";
-  if (lower.includes("macintosh") || lower.includes("mac os")) os = "macOS";
-  else if (lower.includes("windows")) os = "Windows";
-  else if (lower.includes("android")) os = "Android";
-  else if (lower.includes("iphone") || lower.includes("ipad") || lower.includes("ipod")) os = "iOS";
-  else if (lower.includes("linux")) os = "Linux";
-  else if (lower.includes("curl") || lower.includes("node") || lower.includes("skills")) os = "CLI / Terminal";
-
-  // Browser
-  let browser = "Browser";
-  if (lower.includes("edg/")) browser = "Microsoft Edge";
-  else if (lower.includes("opr/") || lower.includes("opera")) browser = "Opera";
-  else if (lower.includes("brave")) browser = "Brave";
-  else if (lower.includes("chrome") && !lower.includes("edg/")) browser = "Google Chrome";
-  else if (lower.includes("safari") && !lower.includes("chrome")) browser = "Apple Safari";
-  else if (lower.includes("firefox")) browser = "Mozilla Firefox";
-  else if (lower.includes("curl")) browser = "cURL";
-  else if (lower.includes("skills")) browser = "Skills CLI";
-  else if (lower.includes("axios") || lower.includes("node-fetch")) browser = "Node.js Client";
-
-  // Device
-  let device = "Desktop";
-  if (lower.includes("mobile") || lower.includes("android") || lower.includes("iphone")) device = "Mobile";
-  else if (lower.includes("ipad") || lower.includes("tablet")) device = "Tablet";
-  else if (lower.includes("curl") || lower.includes("skills") || lower.includes("node")) device = "CLI";
-
-  return { browser, os, device };
-}
-
-export function getCountryFlag(code?: string): string {
-  if (!code || code.length !== 2) return "🌐";
-  if (code.toUpperCase() === "PS") return "🇵🇸";
-  const codePoints = code
-    .toUpperCase()
-    .split("")
-    .map((c) => 127397 + c.charCodeAt(0));
-  return String.fromCodePoint(...codePoints);
-}
-
-function getCountryName(code: string): string {
-  const map: Record<string, string> = {
-    PS: "Palestine",
-    SA: "Saudi Arabia",
-    JO: "Jordan",
-    EG: "Egypt",
-    AE: "United Arab Emirates",
-    QA: "Qatar",
-    KW: "Kuwait",
-    OM: "Oman",
-    BH: "Bahrain",
-    US: "United States",
-    GB: "United Kingdom",
-    DE: "Germany",
-    FR: "France",
-    CA: "Canada",
-    TR: "Turkey",
-  };
-  return map[code.toUpperCase()] || code;
 }

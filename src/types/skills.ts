@@ -73,6 +73,7 @@ export interface InstallLog {
   skillName: string;
   source: string;
   ip: string;
+  deviceUser: string;
   country: string;
   countryCode: string;
   city: string;
