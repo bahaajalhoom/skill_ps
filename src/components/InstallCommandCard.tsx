@@ -8,7 +8,7 @@ import { useLanguage } from "@/context/LanguageContext";
 interface InstallCommandCardProps {
   commands: MultiAgentInstallCommands;
   skillName: string;
-  onInstall?: () => void;
+  onInstall?: (agentTarget?: string) => void;
 }
 
 type AgentTab = "cli" | "claudeCode" | "cursor" | "antigravity" | "windsurf" | "copilot";
@@ -33,7 +33,7 @@ export function InstallCommandCard({ commands, skillName, onInstall }: InstallCo
     navigator.clipboard.writeText(currentCommand);
     setIsCopied(true);
     setTimeout(() => setIsCopied(false), 2000);
-    onInstall?.();
+    onInstall?.(activeTab);
   };
 
   return (

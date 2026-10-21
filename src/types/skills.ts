@@ -66,3 +66,42 @@ export interface SearchResponse {
   skills: SkillLeaderboardItem[];
   count: number;
 }
+
+export interface InstallLog {
+  id: string;
+  skillId: string;
+  skillName: string;
+  source: string;
+  ip: string;
+  country: string;
+  countryCode: string;
+  city: string;
+  region: string;
+  latitude?: number;
+  longitude?: number;
+  isp?: string;
+  userAgent: string;
+  browser: string;
+  os: string;
+  device: string;
+  agentTarget: string;
+  createdAt: string;
+}
+
+export interface TelemetryStats {
+  totalInstalls: number;
+  uniqueIps: number;
+  countriesCount: number;
+  topCustomSkills: { name: string; source: string; installs: number }[];
+  countryBreakdown: { country: string; countryCode: string; count: number }[];
+  agentBreakdown: { agent: string; count: number }[];
+}
+
+export interface AdminTelemetryResponse {
+  success: boolean;
+  stats: TelemetryStats;
+  logs: InstallLog[];
+  total: number;
+  page: number;
+  limit: number;
+}

@@ -130,7 +130,7 @@ function HomePageContent() {
   };
 
   const handleSkillInstall = useCallback(
-    async (skillId: string) => {
+    async (skillId: string, agentTarget = "cli") => {
       // 1. HARD GUARD: ONLY allow incrementing custom skills!
       const targetSkill = skills.find(
         (s) => s.isCustom && (s.id === skillId || s.skillId === skillId)
@@ -159,12 +159,12 @@ function HomePageContent() {
         })
       );
 
-      // 3. Persist to API
+      // 3. Persist to API with telemetry details
       try {
         const res = await apiFetch("/api/skills/install", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ id: skillId }),
+          body: JSON.stringify({ id: skillId, agentTarget }),
         });
         if (res.ok) {
           const data = await res.json();

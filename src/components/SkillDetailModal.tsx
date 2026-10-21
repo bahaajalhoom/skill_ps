@@ -12,7 +12,7 @@ import { apiFetch } from "@/lib/api-config";
 interface SkillDetailModalProps {
   skill: SkillLeaderboardItem | null;
   onClose: () => void;
-  onSkillInstall?: (skillId: string) => void;
+  onSkillInstall?: (skillId: string, agentTarget?: string) => void;
 }
 
 export function SkillDetailModal({ skill, onClose, onSkillInstall }: SkillDetailModalProps) {
@@ -109,9 +109,9 @@ export function SkillDetailModal({ skill, onClose, onSkillInstall }: SkillDetail
                 <InstallCommandCard
                   commands={detail.installCommands}
                   skillName={detail.name}
-                  onInstall={() => {
+                  onInstall={(agentTarget) => {
                     if (skill.isCustom && onSkillInstall) {
-                      onSkillInstall(skill.id);
+                      onSkillInstall(skill.id, agentTarget);
                     }
                   }}
                 />

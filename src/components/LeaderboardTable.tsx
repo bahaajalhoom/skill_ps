@@ -12,7 +12,7 @@ interface LeaderboardTableProps {
   hasMore: boolean;
   onLoadMore: () => void;
   onSelectSkill: (skill: SkillLeaderboardItem) => void;
-  onSkillInstall?: (skillId: string) => void;
+  onSkillInstall?: (skillId: string, agentTarget?: string) => void;
 }
 
 export function LeaderboardTable({
@@ -35,7 +35,7 @@ export function LeaderboardTable({
 
     // ONLY increment dynamic install counter for custom skills
     if (skill.isCustom && onSkillInstall) {
-      onSkillInstall(skill.id);
+      onSkillInstall(skill.id, "cli");
     }
   };
 
