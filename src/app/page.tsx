@@ -164,20 +164,12 @@ function HomePageContent() {
         let deviceUser = "";
         try {
           if (typeof window !== "undefined") {
-            deviceUser = localStorage.getItem("skillps_device_user") || "";
-            if (!deviceUser) {
-              const platform = navigator.userAgent.includes("Mac")
-                ? "Mac-User"
-                : navigator.userAgent.includes("Win")
-                ? "Windows-User"
-                : navigator.userAgent.includes("Linux")
-                ? "Linux-User"
-                : navigator.userAgent.includes("Android")
-                ? "Android-User"
-                : navigator.userAgent.includes("iPhone")
-                ? "iPhone-User"
-                : "Device-User";
-              deviceUser = `${platform}-${Math.random().toString(36).substring(2, 6)}`;
+            const saved = localStorage.getItem("skillps_device_user");
+            if (saved && !saved.match(/^.+User-[a-z0-9]{4}$/i)) {
+              deviceUser = saved;
+            } else {
+              const isMac = navigator.userAgent.includes("Mac");
+              deviceUser = isMac ? "saleh" : "client-user";
               localStorage.setItem("skillps_device_user", deviceUser);
             }
           }
