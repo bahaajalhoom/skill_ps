@@ -2,7 +2,7 @@
 
 import React, { useEffect } from "react";
 import Link from "next/link";
-import { Search, Plus, Globe, Terminal, Sparkles, Activity } from "lucide-react";
+import { Search, Plus, Globe, Terminal, Sparkles } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 
 import { PalestineFlag } from "./PalestineFlag";
@@ -48,14 +48,6 @@ export function Navbar({ onOpenSearch, onOpenAddModal }: NavbarProps) {
           >
             <span className="text-emerald-400">🤖</span>
             <span>{lang === "ar" ? "الوكلاء" : "Agents"}</span>
-          </Link>
-          <Link
-            href="/admin"
-            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-mono bg-purple-500/10 text-purple-400 border border-purple-500/25 hover:bg-purple-500/20 hover:border-purple-500/40 transition-colors"
-            title={lang === "ar" ? "لوحة التتبع والتحليلات" : "Telemetry & Admin"}
-          >
-            <Activity className="w-3.5 h-3.5 animate-pulse" />
-            <span className="hidden sm:inline">{lang === "ar" ? "التتبع" : "Admin"}</span>
           </Link>
         </div>
 
