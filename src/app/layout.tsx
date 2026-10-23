@@ -2,11 +2,52 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { LanguageProvider } from "@/context/LanguageContext";
 
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://skill-ps.apps.taqat.academy";
+
 export const metadata: Metadata = {
-  title: "Skills — The Agent Skills Directory",
-  description: "Discover, inspect and install skills for AI agents (Cursor, Claude Code, Antigravity, Windsurf, Copilot).",
+  metadataBase: new URL(APP_URL),
+  title: {
+    default: "Skills.ps — The Agent Skills Directory 🇵🇸",
+    template: "%s | Skills.ps",
+  },
+  description:
+    "The open directory for AI coding agent skills. Discover, inspect, and install 1,400,000+ workflows for Cursor, Claude Code, Antigravity, Windsurf, and Copilot.",
+  keywords: [
+    "AI Agent Skills",
+    "Cursor Skills",
+    "Claude Code Workflows",
+    "Google Antigravity",
+    "Windsurf Rules",
+    "Developer Workflows",
+    "Agentic AI",
+    "Palestine Tech",
+    "Skills Directory",
+  ],
+  authors: [{ name: "Skills.ps Community", url: APP_URL }],
+  creator: "Skills.ps",
+  publisher: "Skills.ps",
   icons: {
     icon: "/favicon.ico",
+  },
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    alternateLocale: ["ar_PS"],
+    url: APP_URL,
+    title: "Skills.ps — The Agent Skills Directory 🇵🇸",
+    description:
+      "Supercharge your AI coding agents. 1.4M+ skills & workflows for Cursor, Claude Code, Antigravity, and Windsurf.",
+    siteName: "Skills.ps",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Skills.ps — The Agent Skills Directory 🇵🇸",
+    description:
+      "Supercharge your AI coding agents. 1.4M+ skills & workflows for Cursor, Claude Code, Antigravity, and Windsurf.",
+  },
+  robots: {
+    index: true,
+    follow: true,
   },
 };
 
