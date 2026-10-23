@@ -7,23 +7,23 @@ const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://skill-ps.apps.taqat.
 export const metadata: Metadata = {
   metadataBase: new URL(APP_URL),
   title: {
-    default: "Skills.ps — The Agent Skills Directory 🇵🇸",
+    default: "Skills — The Open Agent Skills Ecosystem 🇵🇸",
     template: "%s | Skills.ps",
   },
   description:
-    "The open directory for AI coding agent skills. Discover, inspect, and install 1,400,000+ workflows for Cursor, Claude Code, Antigravity, Windsurf, and Copilot.",
+    "Skills are reusable procedural capabilities for AI agents. Discover, inspect, and install agent skills for Cursor, Claude Code, Antigravity, Windsurf, and GitHub Copilot.",
   keywords: [
-    "AI Agent Skills",
-    "Cursor Skills",
-    "Claude Code Workflows",
-    "Google Antigravity",
-    "Windsurf Rules",
-    "Developer Workflows",
-    "Agentic AI",
-    "Palestine Tech",
-    "Skills Directory",
+    "Skills",
+    "Agent Skills",
+    "Cursor",
+    "Claude Code",
+    "Antigravity",
+    "Windsurf",
+    "GitHub Copilot",
+    "skills.sh",
+    "skills.ps",
   ],
-  authors: [{ name: "Skills.ps Community", url: APP_URL }],
+  authors: [{ name: "Skills.ps", url: APP_URL }],
   creator: "Skills.ps",
   publisher: "Skills.ps",
   icons: {
@@ -34,9 +34,9 @@ export const metadata: Metadata = {
     locale: "en_US",
     alternateLocale: ["ar_PS"],
     url: APP_URL,
-    title: "Skills.ps — The Agent Skills Directory 🇵🇸",
+    title: "Skills — The Open Agent Skills Ecosystem 🇵🇸",
     description:
-      "Supercharge your AI coding agents. 1.4M+ skills & workflows for Cursor, Claude Code, Antigravity, and Windsurf.",
+      "The open directory for AI agent skills. Install skills for Cursor, Claude Code, Antigravity, Windsurf, and GitHub Copilot with one command.",
     siteName: "Skills.ps",
     images: [
       {
@@ -45,7 +45,7 @@ export const metadata: Metadata = {
         width: 1200,
         height: 630,
         type: "image/jpeg",
-        alt: "Skills.ps — The Agent Skills Directory 🇵🇸",
+        alt: "Skills — The Open Agent Skills Ecosystem",
       },
       {
         url: `${APP_URL}/og.png`,
@@ -53,15 +53,15 @@ export const metadata: Metadata = {
         width: 1200,
         height: 630,
         type: "image/png",
-        alt: "Skills.ps — The Agent Skills Directory 🇵🇸",
+        alt: "Skills — The Open Agent Skills Ecosystem",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Skills.ps — The Agent Skills Directory 🇵🇸",
+    title: "Skills — The Open Agent Skills Ecosystem 🇵🇸",
     description:
-      "Supercharge your AI coding agents. 1.4M+ skills & workflows for Cursor, Claude Code, Antigravity, and Windsurf.",
+      "The open directory for AI agent skills. Install skills for Cursor, Claude Code, Antigravity, Windsurf, and GitHub Copilot with one command.",
     images: [`${APP_URL}/og.jpg`],
   },
   robots: {

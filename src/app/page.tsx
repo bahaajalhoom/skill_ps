@@ -15,15 +15,16 @@ import { Copy, Check, Terminal, Search } from "lucide-react";
 
 import { apiFetch } from "@/lib/api-config";
 import { getDynamicDeviceIdentity } from "@/lib/geo-utils";
+import { SEED_SKILLS } from "@/data/seed-skills";
 
 function HomePageContent() {
   const { t } = useLanguage();
 
   const [currentView, setCurrentView] = useState<LeaderboardView>("all-time");
-  const [skills, setSkills] = useState<SkillLeaderboardItem[]>([]);
+  const [skills, setSkills] = useState<SkillLeaderboardItem[]>(() => SEED_SKILLS.slice(0, 10));
   const [page, setPage] = useState(0);
   const [hasMore, setHasMore] = useState(true);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [cacheByView, setCacheByView] = useState<
     Record<string, { skills: SkillLeaderboardItem[]; page: number; hasMore: boolean }>
   >({});
